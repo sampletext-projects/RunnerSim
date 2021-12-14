@@ -4,7 +4,8 @@ namespace RunnerSim
 {
     public class RandomlyFailingRunner : Runner
     {
-        private Random _random = new Random(DateTime.Now.Millisecond);
+        private static readonly Random Random = new Random(DateTime.Now.Millisecond);
+
         public bool HasFailed { get; set; }
 
         public RandomlyFailingRunner(float speed) : base(speed)
@@ -22,7 +23,7 @@ namespace RunnerSim
             base.OnRaceTick(stadiumLength, deltaSeconds);
 
             // с вероятность 10% бегун фэйлит забег (сходит с дистанции)
-            if (_random.Next(0, 10) == 5)
+            if (Random.Next(0, 10) == 5)
             {
                 HasFailed = true;
                 InvokeFinished();
