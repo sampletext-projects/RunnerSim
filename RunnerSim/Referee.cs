@@ -20,7 +20,7 @@ namespace RunnerSim
         public void NoticeRunnerFinish(Runner runner)
         {
             _runners.Add(runner);
-            Console.WriteLine($"Runner {_runners.Count + 1} finished in {runner.ElapsedTime:F2} seconds");
+            // Console.WriteLine($"Runner {_runners.Count + 1} finished in {runner.ElapsedTime:F2} seconds");
 
             if (_runners.Count == RunnersCount)
             {

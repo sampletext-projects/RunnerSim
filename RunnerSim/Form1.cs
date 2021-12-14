@@ -21,16 +21,31 @@ namespace RunnerSim
         private List<Runner> _runners = new();
         private Referee _referee = new();
 
+        private event Action<Referee> RaceStart;
+
+        private string _refereeMessage = "";
+        private bool _isResetRequired;
+
         private Brush _trackBackgroundBrush = new SolidBrush(Color.FromArgb(0xff, 242, 68, 4));
 
         private Random _random = new(DateTime.Now.Millisecond);
 
         private Image _refereeImage = Image.FromFile("Resources/Referee.png");
+        private Image _grassImage = Image.FromFile("Resources/grass.jpg");
 
-        private event Action<Referee> RaceStart;
-
-        private string _refereeMessage = "";
-        private bool _isResetRequired;
+        private Image[] _runnerImages = new[]
+        {
+            Image.FromFile("Resources/runner0.png"),
+            Image.FromFile("Resources/runner1.png"),
+            Image.FromFile("Resources/runner2.png"),
+            Image.FromFile("Resources/runner3.png"),
+            Image.FromFile("Resources/runner4.png"),
+            Image.FromFile("Resources/runner5.png"),
+            Image.FromFile("Resources/runner6.png"),
+            Image.FromFile("Resources/runner7.png"),
+            Image.FromFile("Resources/runner8.png"),
+            Image.FromFile("Resources/runner9.png"),
+        };
 
         public Form1()
         {
@@ -114,6 +129,7 @@ namespace RunnerSim
         private void pictureBoxCanvas_Paint(object sender, PaintEventArgs e)
         {
             int offsetY = pictureBoxCanvas.Height - (_trackHeight + _trackMargin) * 10;
+            e.Graphics.DrawImage(_grassImage, 0, offsetY, pictureBoxCanvas.Width, pictureBoxCanvas.Height - offsetY);
             for (var i = 0; i < _trackCount; i++)
             {
                 // фон дорожки
@@ -139,8 +155,8 @@ namespace RunnerSim
                     }
                     else
                     {
-                        
-                        e.Graphics.FillRectangle(Brushes.Yellow, trackStart + (trackEnd - trackStart) * _runners[i].CurrentPosition, offsetY + i * (_trackHeight + _trackMargin) + 7.5f, 10, 15);
+                        e.Graphics.DrawImage(_runnerImages[i], trackStart + (trackEnd - trackStart) * _runners[i].CurrentPosition, offsetY + i * (_trackHeight + _trackMargin), 30, _trackHeight);
+                        // e.Graphics.FillRectangle(Brushes.Yellow, trackStart + (trackEnd - trackStart) * _runners[i].CurrentPosition, offsetY + i * (_trackHeight + _trackMargin) + 7.5f, 10, 15);
                     }
                 }
             }
@@ -178,6 +194,7 @@ namespace RunnerSim
                     _runners[i].Reset();
                     _runners[i].Speed = _random.Next(7, 13);
                 }
+
                 _referee.Reset();
 
                 _refereeMessage  = "";
@@ -201,7 +218,7 @@ namespace RunnerSim
             await Task.Delay(1000);
             _refereeMessage = "Марш";
             pictureBoxCanvas.Refresh();
-            
+
             for (var i = 0; i < _runners.Count; i++)
             {
                 _runners[i].Index = i + 1;

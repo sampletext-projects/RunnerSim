@@ -25,7 +25,7 @@ namespace RunnerSim
 
         protected void InvokeFinished()
         {
-            HasFinished =  true;
+            HasFinished = true;
             Finished?.Invoke(this);
             Finished -= _referee.NoticeRunnerFinish;
             _referee =  null;
