@@ -13,6 +13,10 @@ namespace RunnerSim
         public bool HasFinished { get; set; }
 
         public float ElapsedTime { get; set; }
+        
+        public bool HasStopped { get; set; }
+
+        private int _stoppedTicks = 0;
 
         public event Action<Runner> Finished;
 
@@ -35,17 +39,29 @@ namespace RunnerSim
         {
             CurrentPosition = 0f;
             ElapsedTime     = 0f;
+            _stoppedTicks   = 0;
+            HasStopped      = false;
             HasFinished     = false;
         }
 
         public virtual void OnRaceTick(float stadiumLength, float deltaSeconds)
         {
-            ElapsedTime     += deltaSeconds;
-            CurrentPosition =  ((CurrentPosition * stadiumLength) + Speed * deltaSeconds) / stadiumLength;
-            if (CurrentPosition > 1)
+            if (CurrentPosition > 1 && !HasFinished)
             {
-                CurrentPosition = 1;
                 InvokeFinished();
+            }
+            else if (CurrentPosition > 1 && HasFinished)
+            {
+                if (_stoppedTicks < 10)
+                {
+                    _stoppedTicks++;
+                    CurrentPosition = ((CurrentPosition * stadiumLength) + Speed / 2f * deltaSeconds) / stadiumLength;
+                }
+            }
+            else
+            {
+                ElapsedTime     += deltaSeconds;
+                CurrentPosition =  ((CurrentPosition * stadiumLength) + Speed * deltaSeconds) / stadiumLength;
             }
         }
 

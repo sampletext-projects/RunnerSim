@@ -37,27 +37,13 @@ namespace RunnerSim
         public string GetStats()
         {
             StringBuilder builder       = new StringBuilder();
-            StringBuilder failedBuilder = new StringBuilder();
             int           index         = 1;
             for (var i = 0; i < _runners.Count; i++)
             {
-                if (_runners[i] is RandomlyFailingRunner { HasFailed: true })
-                {
-                    continue;
-                }
-
                 builder.AppendLine($"{index++} - {_runners[i].GetStats()}");
             }
 
-            for (var i = 0; i < _runners.Count; i++)
-            {
-                if (_runners[i] is RandomlyFailingRunner { HasFailed: true })
-                {
-                    failedBuilder.AppendLine($"{index++} - {_runners[i].GetStats()}");
-                }
-            }
-
-            return builder.ToString() + failedBuilder.ToString();
+            return builder.ToString();
         }
     }
 }

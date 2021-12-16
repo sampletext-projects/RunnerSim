@@ -16,7 +16,7 @@ namespace RunnerSim
 
         private int _tracksLeftOffset = 30;
 
-        private float _stadiumLength = 30;
+        private int _stadiumLength = 30;
 
         private List<Runner> _runners = new();
         private Referee _referee = new();
@@ -54,8 +54,9 @@ namespace RunnerSim
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            numericUpDownRunners.Value = _runnersCount;
-            numericUpDownTracks.Value  = _trackCount;
+            numericUpDownRunners.Value       = _runnersCount;
+            numericUpDownTracks.Value        = _trackCount;
+            numericUpDownStadiumLength.Value = _stadiumLength;
             for (var i = 0; i < _runnersCount; i++)
             {
                 AddRunner();
@@ -105,7 +106,7 @@ namespace RunnerSim
             }
             else
             {
-                runner = new RandomlyFailingRunner(_random.Next(7, 13));
+                runner = new BarrierRunner(_random.Next(7, 13));
             }
 
             RaceStart += runner.OnRaceStart;
@@ -126,49 +127,66 @@ namespace RunnerSim
             pictureBoxCanvas.Refresh();
         }
 
+        private void numericUpDownStadiumLength_ValueChanged(object sender, EventArgs e)
+        {
+            var newValue = (int)numericUpDownStadiumLength.Value;
+            _stadiumLength = newValue;
+        }
+
         private void pictureBoxCanvas_Paint(object sender, PaintEventArgs e)
         {
-            int offsetY = pictureBoxCanvas.Height - (_trackHeight + _trackMargin) * 10;
-            e.Graphics.DrawImage(_grassImage, 0, offsetY, pictureBoxCanvas.Width, pictureBoxCanvas.Height - offsetY);
+            int stadiumOffsetY = pictureBoxCanvas.Height - (_trackHeight + _trackMargin) * 10;
+            e.Graphics.DrawImage(_grassImage, 0, stadiumOffsetY, pictureBoxCanvas.Width, pictureBoxCanvas.Height - stadiumOffsetY);
             for (var i = 0; i < _trackCount; i++)
             {
                 // фон дорожки
-                e.Graphics.FillRectangle(_trackBackgroundBrush, 0, offsetY + i * (_trackHeight + _trackMargin), pictureBoxCanvas.Width, _trackHeight);
+                e.Graphics.FillRectangle(_trackBackgroundBrush, 0, stadiumOffsetY + i * (_trackHeight + _trackMargin), pictureBoxCanvas.Width, _trackHeight);
 
                 // координаты начала и конца трека
                 float trackStart = _tracksLeftOffset + i * 20;
-                float trackEnd   = pictureBoxCanvas.Width - (_trackCount - i) * 20;
+                float trackEnd   = pictureBoxCanvas.Width - (_trackCount - i + 3) * 20;
 
                 // стартовая черта
-                e.Graphics.FillRectangle(Brushes.White, trackStart, offsetY + i * (_trackHeight + _trackMargin), 5, _trackHeight);
+                e.Graphics.FillRectangle(Brushes.White, trackStart, stadiumOffsetY + i * (_trackHeight + _trackMargin), 5, _trackHeight);
 
                 // финишная черта
-                e.Graphics.FillRectangle(Brushes.White, trackEnd, offsetY + i * (_trackHeight + _trackMargin), 5, _trackHeight);
+                e.Graphics.FillRectangle(Brushes.White, trackEnd, stadiumOffsetY + i * (_trackHeight + _trackMargin), 5, _trackHeight);
 
                 if (i < _runnersCount)
                 {
                     // бегун
 
-                    if (_runners[i] is RandomlyFailingRunner { HasFailed: true })
+                    int runnerY = stadiumOffsetY + i * (_trackHeight + _trackMargin);
+                    if (_runners[i] is BarrierRunner barrierRunner)
                     {
-                        e.Graphics.FillRectangle(Brushes.White, trackStart + (trackEnd - trackStart) * _runners[i].CurrentPosition, offsetY + i * (_trackHeight + _trackMargin) + 7.5f, 10, 15);
+                        e.Graphics.FillRectangle(Brushes.White, trackStart + (trackEnd - trackStart) * 0.33f - 30, stadiumOffsetY + i * (_trackHeight + _trackMargin) + 3f, 5, 24);
+                        e.Graphics.FillRectangle(Brushes.White, trackStart + (trackEnd - trackStart) * 0.66f - 30, stadiumOffsetY + i * (_trackHeight + _trackMargin) + 3f, 5, 24);
+
+                        float distanceToBarrier;
+                        if ((distanceToBarrier = MathF.Abs(_runners[i].CurrentPosition - 0.33f)) < 0.05f)
+                        {
+                            // График получается такой \/, поэтому мы его конвертируем (умножаем на -1 и добавляем 1), получая /\, как раз как надо
+                            runnerY -= (int)((distanceToBarrier * -1 + 1) * 20);
+                        }
+
+                        if ((distanceToBarrier = MathF.Abs(_runners[i].CurrentPosition - 0.66f)) < 0.05f)
+                        {
+                            runnerY -= (int)((distanceToBarrier * -1 + 1) * 20);
+                        }
                     }
-                    else
-                    {
-                        e.Graphics.DrawImage(_runnerImages[i], trackStart + (trackEnd - trackStart) * _runners[i].CurrentPosition, offsetY + i * (_trackHeight + _trackMargin), 30, _trackHeight);
-                        // e.Graphics.FillRectangle(Brushes.Yellow, trackStart + (trackEnd - trackStart) * _runners[i].CurrentPosition, offsetY + i * (_trackHeight + _trackMargin) + 7.5f, 10, 15);
-                    }
+
+                    e.Graphics.DrawImage(_runnerImages[i], trackStart + (trackEnd - trackStart) * _runners[i].CurrentPosition - 30, runnerY, 30, _trackHeight);
                 }
             }
 
             e.Graphics.DrawImage(_refereeImage, 0, 0, 30, 30);
 
-            e.Graphics.FillRectangle(Brushes.Yellow, 30, 0, pictureBoxCanvas.Width - 30 - 1, offsetY - 1);
-            e.Graphics.DrawRectangle(Pens.Black, 30, 0, pictureBoxCanvas.Width - 30 - 1, offsetY - 1);
+            e.Graphics.FillRectangle(Brushes.Yellow, 30, 0, pictureBoxCanvas.Width - 30 - 1, stadiumOffsetY - 1);
+            e.Graphics.DrawRectangle(Pens.Black, 30, 0, pictureBoxCanvas.Width - 30 - 1, stadiumOffsetY - 1);
 
             var refereeMessageSize = e.Graphics.MeasureString(_refereeMessage, DefaultFont);
 
-            e.Graphics.DrawString(_refereeMessage, DefaultFont, Brushes.Black, 30 + (pictureBoxCanvas.Width - 30) / 2 - refereeMessageSize.Width / 2, offsetY / 2 - refereeMessageSize.Height / 2);
+            e.Graphics.DrawString(_refereeMessage, DefaultFont, Brushes.Black, 30 + (pictureBoxCanvas.Width - 30) / 2 - refereeMessageSize.Width / 2, stadiumOffsetY / 2 - refereeMessageSize.Height / 2);
         }
 
         private void timerRace_Tick(object sender, EventArgs e)
@@ -176,7 +194,7 @@ namespace RunnerSim
             float deltaSeconds = timerRace.Interval / 1000f;
             for (var i = 0; i < _runnersCount; i++)
             {
-                if (!_runners[i].HasFinished)
+                if (!_runners[i].HasStopped)
                 {
                     _runners[i].OnRaceTick(_stadiumLength, deltaSeconds);
                 }
@@ -204,9 +222,10 @@ namespace RunnerSim
                 return;
             }
 
-            numericUpDownRunners.Enabled = false;
-            numericUpDownTracks.Enabled  = false;
-            buttonStart.Enabled          = false;
+            numericUpDownRunners.Enabled       = false;
+            numericUpDownTracks.Enabled        = false;
+            numericUpDownStadiumLength.Enabled = false;
+            buttonStart.Enabled                = false;
 
             _referee.RunnersCount = _runnersCount;
 
@@ -231,20 +250,21 @@ namespace RunnerSim
 
         private async void OnRaceFinished()
         {
-            timerRace.Stop();
-
             _refereeMessage = "Подсчёт результатов";
             pictureBoxCanvas.Refresh();
             await Task.Delay(2000);
 
+            timerRace.Stop();
+
             _refereeMessage = _referee.GetStats();
             pictureBoxCanvas.Refresh();
 
-            numericUpDownRunners.Enabled = true;
-            numericUpDownTracks.Enabled  = true;
-            buttonStart.Enabled          = true;
-            buttonStart.Text             = "Сброс";
-            _isResetRequired             = true;
+            numericUpDownRunners.Enabled       = true;
+            numericUpDownTracks.Enabled        = true;
+            numericUpDownStadiumLength.Enabled = true;
+            buttonStart.Enabled                = true;
+            buttonStart.Text                   = "Сброс";
+            _isResetRequired                   = true;
         }
     }
 }
