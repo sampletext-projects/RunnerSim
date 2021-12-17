@@ -8,28 +8,42 @@ namespace RunnerSim
 {
     public partial class Form1 : Form
     {
+        // количество бегунов
         private int _runnersCount = 4;
+
+        // количество дорожек
         private int _trackCount = 8;
 
+        // высота одной дорожки
         private int _trackHeight = 30;
+
+        // отступ между дорожками
         private int _trackMargin = 10;
 
+        // отступ дорожки слева
         private int _tracksLeftOffset = 30;
 
+        // длина стадиона
         private int _stadiumLength = 30;
 
+        // бегуны и судья
         private List<Runner> _runners = new();
         private Referee _referee = new();
 
+        // событие старта гонки
         private event Action<Referee> RaceStart;
 
+        // сообщение судьи
         private string _refereeMessage = "";
         private bool _isResetRequired;
 
+        // цвет дорожки
         private Brush _trackBackgroundBrush = new SolidBrush(Color.FromArgb(0xff, 242, 68, 4));
 
+        // рандом
         private Random _random = new(DateTime.Now.Millisecond);
 
+        // картинки
         private Image _refereeImage = Image.FromFile("Resources/Referee.png");
         private Image _grassImage = Image.FromFile("Resources/grass.jpg");
 
@@ -52,6 +66,7 @@ namespace RunnerSim
             InitializeComponent();
         }
 
+        // Открытие приложения
         private void Form1_Load(object sender, EventArgs e)
         {
             numericUpDownRunners.Value       = _runnersCount;
@@ -65,6 +80,7 @@ namespace RunnerSim
             _referee.RaceFinished += OnRaceFinished;
         }
 
+        // изменение количества бегунов
         private void numericUpDownRunners_ValueChanged(object sender, EventArgs e)
         {
             var newValue = (int)numericUpDownRunners.Value;
@@ -97,10 +113,11 @@ namespace RunnerSim
             pictureBoxCanvas.Refresh();
         }
 
+        // добавление бегуна
         private void AddRunner()
         {
             Runner runner;
-            if (_random.Next(0, 10) < 5)
+            if (_runners.Count < 5)
             {
                 runner = new Runner(_random.Next(7, 13));
             }
@@ -112,7 +129,7 @@ namespace RunnerSim
             RaceStart += runner.OnRaceStart;
             _runners.Add(runner);
         }
-
+        // изменение количества дорожек
         private void numericUpDownTracks_ValueChanged(object sender, EventArgs e)
         {
             var newValue = (int)numericUpDownTracks.Value;
@@ -126,13 +143,14 @@ namespace RunnerSim
             _trackCount = newValue;
             pictureBoxCanvas.Refresh();
         }
-
+        // изменение длины стадиона
         private void numericUpDownStadiumLength_ValueChanged(object sender, EventArgs e)
         {
             var newValue = (int)numericUpDownStadiumLength.Value;
             _stadiumLength = newValue;
         }
 
+        // отрисовка
         private void pictureBoxCanvas_Paint(object sender, PaintEventArgs e)
         {
             int stadiumOffsetY = pictureBoxCanvas.Height - (_trackHeight + _trackMargin) * 10;
@@ -189,6 +207,7 @@ namespace RunnerSim
             e.Graphics.DrawString(_refereeMessage, DefaultFont, Brushes.Black, 30 + (pictureBoxCanvas.Width - 30) / 2 - refereeMessageSize.Width / 2, stadiumOffsetY / 2 - refereeMessageSize.Height / 2);
         }
 
+        // таймер перерисовки
         private void timerRace_Tick(object sender, EventArgs e)
         {
             float deltaSeconds = timerRace.Interval / 1000f;
@@ -203,6 +222,7 @@ namespace RunnerSim
             pictureBoxCanvas.Refresh();
         }
 
+        // нажатие на кнопку старт/сброс
         private async void buttonStart_Click(object sender, EventArgs e)
         {
             if (_isResetRequired)
@@ -248,6 +268,7 @@ namespace RunnerSim
             timerRace.Start();
         }
 
+        // обработка события завершения гонки
         private async void OnRaceFinished()
         {
             _refereeMessage = "Подсчёт результатов";

@@ -2,24 +2,34 @@
 
 namespace RunnerSim
 {
+    // Бегун
     public class Runner
     {
+        // Номер дорожки
         public int Index { get; set; }
 
+        // Текущая позиция
         public float CurrentPosition { get; set; }
 
+        // Скорость
         public float Speed { get; set; }
 
+        // Финишировал ли?
         public bool HasFinished { get; set; }
 
+        // Сколько времени бежит
         public float ElapsedTime { get; set; }
         
+        // Остановился ли?
         public bool HasStopped { get; set; }
 
+        // Сколько тиков таймера после финиша прошло
         private int _stoppedTicks = 0;
 
+        // Событие финиширования
         public event Action<Runner> Finished;
 
+        // Судья
         private Referee _referee;
 
         public Runner(float speed)
@@ -27,6 +37,7 @@ namespace RunnerSim
             Speed = speed;
         }
 
+        // Обработка финиширования
         protected void InvokeFinished()
         {
             HasFinished = true;
@@ -35,6 +46,7 @@ namespace RunnerSim
             _referee =  null;
         }
 
+        // Сброс
         public virtual void Reset()
         {
             CurrentPosition = 0f;
@@ -44,6 +56,7 @@ namespace RunnerSim
             HasFinished     = false;
         }
 
+        // Обработка тика таймера (кадра)
         public virtual void OnRaceTick(float stadiumLength, float deltaSeconds)
         {
             if (CurrentPosition > 1 && !HasFinished)
@@ -65,12 +78,14 @@ namespace RunnerSim
             }
         }
 
+        // Событие старта гонки
         public void OnRaceStart(Referee referee)
         {
             _referee =  referee;
             Finished += referee.NoticeRunnerFinish;
         }
 
+        // Выдача своей статистики
         public virtual string GetStats()
         {
             return $"Бегун {Index}: Время - {ElapsedTime:F2} секунд.";

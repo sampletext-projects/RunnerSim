@@ -4,12 +4,16 @@ using System.Text;
 
 namespace RunnerSim
 {
+    // Судья
     public class Referee
     {
+        // список бегунов
         private List<Runner> _runners;
 
+        // количество бегунов
         public int RunnersCount { get; set; }
 
+        // Событие завершения гонки
         public event Action RaceFinished;
 
         public Referee()
@@ -17,6 +21,7 @@ namespace RunnerSim
             _runners = new();
         }
 
+        // Обработки финиша одного бегуна
         public void NoticeRunnerFinish(Runner runner)
         {
             _runners.Add(runner);
@@ -28,12 +33,14 @@ namespace RunnerSim
             }
         }
 
+        // Сброс
         public void Reset()
         {
             _runners.Clear();
             RunnersCount = 0;
         }
 
+        // Сбор статистики
         public string GetStats()
         {
             StringBuilder builder       = new StringBuilder();
