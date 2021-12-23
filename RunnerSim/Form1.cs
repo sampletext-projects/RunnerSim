@@ -30,8 +30,6 @@ namespace RunnerSim
         private List<Runner> _runners = new();
         private Referee _referee = new();
 
-        // событие старта гонки
-        private event Action<Referee> RaceStart;
 
         // сообщение судьи
         private string _refereeMessage = "";
@@ -104,7 +102,7 @@ namespace RunnerSim
                 for (int i = 0; i < _runnersCount - newValue; i++)
                 {
                     var runner = _runners[_runners.Count - 1];
-                    RaceStart -= runner.OnRaceStart;
+                    _referee.RaceStarted -= runner.OnRaceStart;
                     _runners.RemoveAt(_runners.Count - 1);
                 }
             }
@@ -126,9 +124,10 @@ namespace RunnerSim
                 runner = new BarrierRunner(_random.Next(7, 13));
             }
 
-            RaceStart += runner.OnRaceStart;
+            _referee.RaceStarted += runner.OnRaceStart;
             _runners.Add(runner);
         }
+
         // изменение количества дорожек
         private void numericUpDownTracks_ValueChanged(object sender, EventArgs e)
         {
@@ -143,6 +142,7 @@ namespace RunnerSim
             _trackCount = newValue;
             pictureBoxCanvas.Refresh();
         }
+
         // изменение длины стадиона
         private void numericUpDownStadiumLength_ValueChanged(object sender, EventArgs e)
         {
@@ -263,7 +263,7 @@ namespace RunnerSim
                 _runners[i].Index = i + 1;
             }
 
-            RaceStart?.Invoke(_referee);
+            _referee.StartRace();
 
             timerRace.Start();
         }

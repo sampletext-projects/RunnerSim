@@ -8,26 +8,34 @@ namespace RunnerSim
     public class Referee
     {
         // список бегунов
-        private List<Runner> _runners;
+        private List<Runner> _finishedRunners;
 
         // количество бегунов
         public int RunnersCount { get; set; }
 
         // Событие завершения гонки
         public event Action RaceFinished;
+        
+        // событие старта гонки
+        public event Action<Referee> RaceStarted;
 
         public Referee()
         {
-            _runners = new();
+            _finishedRunners = new();
+        }
+
+        public void StartRace()
+        {
+            RaceStarted?.Invoke(this);
         }
 
         // Обработки финиша одного бегуна
         public void NoticeRunnerFinish(Runner runner)
         {
-            _runners.Add(runner);
+            _finishedRunners.Add(runner);
             // Console.WriteLine($"Runner {_runners.Count + 1} finished in {runner.ElapsedTime:F2} seconds");
 
-            if (_runners.Count == RunnersCount)
+            if (_finishedRunners.Count == RunnersCount)
             {
                 RaceFinished?.Invoke();
             }
@@ -36,7 +44,7 @@ namespace RunnerSim
         // Сброс
         public void Reset()
         {
-            _runners.Clear();
+            _finishedRunners.Clear();
             RunnersCount = 0;
         }
 
@@ -45,9 +53,9 @@ namespace RunnerSim
         {
             StringBuilder builder       = new StringBuilder();
             int           index         = 1;
-            for (var i = 0; i < _runners.Count; i++)
+            for (var i = 0; i < _finishedRunners.Count; i++)
             {
-                builder.AppendLine($"{index++} - {_runners[i].GetStats()}");
+                builder.AppendLine($"{index++} - {_finishedRunners[i].GetStats()}");
             }
 
             return builder.ToString();
