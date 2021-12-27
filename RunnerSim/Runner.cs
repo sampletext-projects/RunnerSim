@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace RunnerSim
 {
@@ -19,7 +20,7 @@ namespace RunnerSim
 
         // Сколько времени бежит
         public float ElapsedTime { get; set; }
-        
+
         // Остановился ли?
         public bool HasStopped { get; set; }
 
@@ -76,6 +77,14 @@ namespace RunnerSim
                 ElapsedTime     += deltaSeconds;
                 CurrentPosition =  ((CurrentPosition * stadiumLength) + Speed * deltaSeconds) / stadiumLength;
             }
+        }
+
+
+        public virtual void Draw(Graphics g, int stadiumOffsetY, int i, float trackStart, float trackEnd, int trackHeight, int trackMargin, Image[] runnerImages)
+        {
+            int runnerY = stadiumOffsetY + i * (trackHeight + trackMargin);
+
+            g.DrawImage(runnerImages[i], trackStart + (trackEnd - trackStart) * CurrentPosition - 30, runnerY, 30, trackHeight);
         }
 
         // Событие старта гонки

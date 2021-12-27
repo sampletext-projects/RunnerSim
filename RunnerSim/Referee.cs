@@ -13,11 +13,15 @@ namespace RunnerSim
         // количество бегунов
         public int RunnersCount { get; set; }
 
+        public delegate void EmptyVoid();
+        
+        public delegate void VoidWithReferee(Referee referee);
+
         // Событие завершения гонки
-        public event Action RaceFinished;
+        public event EmptyVoid RaceFinished;
         
         // событие старта гонки
-        public event Action<Referee> RaceStarted;
+        public event VoidWithReferee RaceStarted;
 
         public Referee()
         {

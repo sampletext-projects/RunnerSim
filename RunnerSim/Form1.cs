@@ -174,26 +174,7 @@ namespace RunnerSim
                 {
                     // бегун
 
-                    int runnerY = stadiumOffsetY + i * (_trackHeight + _trackMargin);
-                    if (_runners[i] is BarrierRunner barrierRunner)
-                    {
-                        e.Graphics.FillRectangle(Brushes.White, trackStart + (trackEnd - trackStart) * 0.33f - 30, stadiumOffsetY + i * (_trackHeight + _trackMargin) + 3f, 5, 24);
-                        e.Graphics.FillRectangle(Brushes.White, trackStart + (trackEnd - trackStart) * 0.66f - 30, stadiumOffsetY + i * (_trackHeight + _trackMargin) + 3f, 5, 24);
-
-                        float distanceToBarrier;
-                        if ((distanceToBarrier = MathF.Abs(_runners[i].CurrentPosition - 0.33f)) < 0.05f)
-                        {
-                            // График получается такой \/, поэтому мы его конвертируем (умножаем на -1 и добавляем 1), получая /\, как раз как надо
-                            runnerY -= (int)((distanceToBarrier * -1 + 1) * 20);
-                        }
-
-                        if ((distanceToBarrier = MathF.Abs(_runners[i].CurrentPosition - 0.66f)) < 0.05f)
-                        {
-                            runnerY -= (int)((distanceToBarrier * -1 + 1) * 20);
-                        }
-                    }
-
-                    e.Graphics.DrawImage(_runnerImages[i], trackStart + (trackEnd - trackStart) * _runners[i].CurrentPosition - 30, runnerY, 30, _trackHeight);
+                    _runners[i].Draw(e.Graphics, stadiumOffsetY, i, trackStart, trackEnd, _trackHeight, _trackMargin, _runnerImages);
                 }
             }
 
