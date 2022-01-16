@@ -39,6 +39,8 @@
             this.buttonStart = new System.Windows.Forms.Button();
             this.numericUpDownStadiumLength = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
+            this.radioButtonMode1 = new System.Windows.Forms.RadioButton();
+            this.radioButtonMode2 = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxCanvas)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRunners)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTracks)).BeginInit();
@@ -50,7 +52,7 @@
             this.pictureBoxCanvas.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBoxCanvas.Location = new System.Drawing.Point(8, 40);
             this.pictureBoxCanvas.Name = "pictureBoxCanvas";
-            this.pictureBoxCanvas.Size = new System.Drawing.Size(1016, 656);
+            this.pictureBoxCanvas.Size = new System.Drawing.Size(1192, 656);
             this.pictureBoxCanvas.TabIndex = 0;
             this.pictureBoxCanvas.TabStop = false;
             this.pictureBoxCanvas.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBoxCanvas_Paint);
@@ -126,7 +128,7 @@
             // 
             // buttonStart
             // 
-            this.buttonStart.Location = new System.Drawing.Point(800, 8);
+            this.buttonStart.Location = new System.Drawing.Point(976, 8);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(224, 23);
             this.buttonStart.TabIndex = 3;
@@ -171,11 +173,37 @@
             this.label3.TabIndex = 2;
             this.label3.Text = "Длина стадиона";
             // 
+            // radioButtonMode1
+            // 
+            this.radioButtonMode1.AutoSize = true;
+            this.radioButtonMode1.Checked = true;
+            this.radioButtonMode1.Location = new System.Drawing.Point(768, 8);
+            this.radioButtonMode1.Name = "radioButtonMode1";
+            this.radioButtonMode1.Size = new System.Drawing.Size(80, 19);
+            this.radioButtonMode1.TabIndex = 4;
+            this.radioButtonMode1.TabStop = true;
+            this.radioButtonMode1.Text = "Обычный";
+            this.radioButtonMode1.UseVisualStyleBackColor = true;
+            this.radioButtonMode1.CheckedChanged += new System.EventHandler(this.radioButtonMode_CheckedChanged);
+            // 
+            // radioButtonMode2
+            // 
+            this.radioButtonMode2.AutoSize = true;
+            this.radioButtonMode2.Location = new System.Drawing.Point(856, 8);
+            this.radioButtonMode2.Name = "radioButtonMode2";
+            this.radioButtonMode2.Size = new System.Drawing.Size(97, 19);
+            this.radioButtonMode2.TabIndex = 5;
+            this.radioButtonMode2.Text = "С барьерами";
+            this.radioButtonMode2.UseVisualStyleBackColor = true;
+            this.radioButtonMode2.CheckedChanged += new System.EventHandler(this.radioButtonMode_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1033, 699);
+            this.ClientSize = new System.Drawing.Size(1210, 699);
+            this.Controls.Add(this.radioButtonMode2);
+            this.Controls.Add(this.radioButtonMode1);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -207,5 +235,7 @@
         private System.Windows.Forms.Button buttonStart;
         private System.Windows.Forms.NumericUpDown numericUpDownStadiumLength;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.RadioButton radioButtonMode1;
+        private System.Windows.Forms.RadioButton radioButtonMode2;
     }
 }

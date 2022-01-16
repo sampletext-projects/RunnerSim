@@ -66,7 +66,7 @@ namespace RunnerSim
             }
             else if (CurrentPosition > 1 && HasFinished)
             {
-                if (_stoppedTicks < 10)
+                if (_stoppedTicks < 15)
                 {
                     _stoppedTicks++;
                     CurrentPosition = ((CurrentPosition * stadiumLength) + Speed / 2f * deltaSeconds) / stadiumLength;

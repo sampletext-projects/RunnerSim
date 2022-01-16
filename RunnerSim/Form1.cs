@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Media;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -26,10 +27,13 @@ namespace RunnerSim
         // длина стадиона
         private int _stadiumLength = 30;
 
+        private bool _isModeWithBarriers = false;
+
         // бегуны и судья
         private List<Runner> _runners = new();
         private Referee _referee = new();
 
+        private event Action RaceStart;
 
         // сообщение судьи
         private string _refereeMessage = "";
@@ -59,6 +63,9 @@ namespace RunnerSim
             Image.FromFile("Resources/runner9.png"),
         };
 
+        private SoundPlayer _gunshotSoundPlayer = new SoundPlayer("Resources/gunshot.wav");
+        private SoundPlayer _whistleSoundPlayer = new SoundPlayer("Resources/whistle.wav");
+
         public Form1()
         {
             InitializeComponent();
@@ -75,7 +82,10 @@ namespace RunnerSim
                 AddRunner();
             }
 
+            RaceStart             += OnRaceStart;
             _referee.RaceFinished += OnRaceFinished;
+            _gunshotSoundPlayer.Load();
+            _whistleSoundPlayer.Load();
         }
 
         // изменение количества бегунов
@@ -115,13 +125,13 @@ namespace RunnerSim
         private void AddRunner()
         {
             Runner runner;
-            if (_runners.Count < 5)
+            if (_isModeWithBarriers)
             {
-                runner = new Runner(_random.Next(7, 13));
+                runner = new BarrierRunner(_random.Next(7, 13));
             }
             else
             {
-                runner = new BarrierRunner(_random.Next(7, 13));
+                runner = new Runner(_random.Next(7, 13));
             }
 
             _referee.RaceStarted += runner.OnRaceStart;
@@ -203,8 +213,7 @@ namespace RunnerSim
             pictureBoxCanvas.Refresh();
         }
 
-        // нажатие на кнопку старт/сброс
-        private async void buttonStart_Click(object sender, EventArgs e)
+        private async void OnRaceStart()
         {
             if (_isResetRequired)
             {
@@ -219,7 +228,9 @@ namespace RunnerSim
                 _refereeMessage  = "";
                 buttonStart.Text = "Старт";
                 pictureBoxCanvas.Refresh();
-                _isResetRequired = false;
+                _isResetRequired         = false;
+                radioButtonMode1.Enabled = true;
+                radioButtonMode2.Enabled = true;
                 return;
             }
 
@@ -227,6 +238,8 @@ namespace RunnerSim
             numericUpDownTracks.Enabled        = false;
             numericUpDownStadiumLength.Enabled = false;
             buttonStart.Enabled                = false;
+            radioButtonMode1.Enabled           = false;
+            radioButtonMode2.Enabled           = false;
 
             _referee.RunnersCount = _runnersCount;
 
@@ -239,6 +252,8 @@ namespace RunnerSim
             _refereeMessage = "Марш";
             pictureBoxCanvas.Refresh();
 
+            _gunshotSoundPlayer.Play();
+
             for (var i = 0; i < _runners.Count; i++)
             {
                 _runners[i].Index = i + 1;
@@ -249,9 +264,16 @@ namespace RunnerSim
             timerRace.Start();
         }
 
+        // нажатие на кнопку старт/сброс
+        private void buttonStart_Click(object sender, EventArgs e)
+        {
+            RaceStart?.Invoke();
+        }
+
         // обработка события завершения гонки
         private async void OnRaceFinished()
         {
+            _whistleSoundPlayer.Play();
             _refereeMessage = "Подсчёт результатов";
             pictureBoxCanvas.Refresh();
             await Task.Delay(2000);
@@ -267,6 +289,26 @@ namespace RunnerSim
             buttonStart.Enabled                = true;
             buttonStart.Text                   = "Сброс";
             _isResetRequired                   = true;
+        }
+
+        private void radioButtonMode_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonMode1.Checked)
+            {
+                _isModeWithBarriers = false;
+            }
+            else
+            {
+                _isModeWithBarriers = true;
+            }
+
+            _runners.Clear();
+            for (var i = 0; i < _runnersCount; i++)
+            {
+                AddRunner();
+            }
+
+            pictureBoxCanvas.Refresh();
         }
     }
 }
